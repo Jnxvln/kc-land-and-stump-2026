@@ -1,5 +1,10 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import {
+	createRootRoute,
+	HeadContent,
+	Link,
+	Scripts,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { MobileCallBar } from "#/components/MobileCallBar";
 import { SiteFooter } from "#/components/SiteFooter";
@@ -30,6 +35,7 @@ export const Route = createRootRoute({
 		],
 	}),
 	shellComponent: RootDocument,
+	notFoundComponent: NotFound,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -55,5 +61,23 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<Scripts />
 			</body>
 		</html>
+	);
+}
+
+function NotFound() {
+	return (
+		<section className="px-5 py-24 md:px-16">
+			<div className="mx-auto flex max-w-[1240px] flex-col items-start gap-5">
+				<h1 className="m-0 font-display text-[40px] font-extrabold font-stretch-expanded text-cream">
+					Page not found
+				</h1>
+				<p className="m-0 text-xl">
+					That page doesn't exist, but the phone number still works.
+				</p>
+				<Link to="/" className="font-bold text-tractor">
+					← Back to the home page
+				</Link>
+			</div>
+		</section>
 	);
 }

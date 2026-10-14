@@ -1,47 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { CallTodayBand } from "#/components/CallTodayBand";
 import { PhoneIcon } from "#/components/PhoneIcon";
+import { ServiceGrid } from "#/components/ServiceCard";
 import { site } from "#/lib/site";
+import { container, h2, sectionX } from "#/lib/ui";
 
 export const Route = createFileRoute("/")({
 	component: HomePage,
 });
-
-const services = [
-	{
-		title: "Stump Grinding",
-		blurb:
-			"Tree stumps removed so you can get your yard, and your mower, back.",
-		image: "/images/services/stump/stump-d81.webp",
-		alt: "Stump grinding job",
-	},
-	{
-		title: "Land Clearing",
-		blurb:
-			"Brush, overgrowth, and small trees cleared with bush hog, loader, and grapple.",
-		image: "/images/services/land/land-i381u.webp",
-		alt: "Land clearing job",
-	},
-	{
-		title: "Dirt Work",
-		blurb:
-			"Digging, spreading, grading, and hauling dirt for small to mid-size projects.",
-		image: "/images/services/dirtwork/dirtwork-fi1ds.webp",
-		alt: "Dirt work job",
-	},
-	{
-		title: "Gravel Spreading",
-		blurb:
-			"Gravel hauled, spread, graded, and packed for driveways, small roads, and walkways.",
-		image: "/images/services/gravel/gravel-k3401.webp",
-		alt: "Gravel spreading job",
-	},
-	{
-		title: "Hauling & Delivery",
-		blurb: "Dump-trailer hauling and deliveries of dirt, gravel, and more.",
-		image: "/images/services/hauling/hauling-e81iz.webp",
-		alt: "Truck and dump trailer",
-	},
-] as const;
 
 // Temporary: replaced by the newest uploads once the photo system exists.
 const recentWork = [
@@ -82,18 +48,6 @@ const reasons = [
 	},
 ] as const;
 
-const towns = [
-	"Atlanta, TX",
-	"Texarkana, TX",
-	"Queen City, TX",
-	"Redwater, TX",
-];
-
-const sectionX = "px-5 md:px-16";
-const container = "mx-auto max-w-[1240px]";
-const h2 =
-	"m-0 font-display text-[32px] font-extrabold font-stretch-expanded md:text-[40px]";
-
 function HomePage() {
 	return (
 		<>
@@ -101,7 +55,7 @@ function HomePage() {
 			<Services />
 			<RecentWork />
 			<WhyUs />
-			<CallToday />
+			<CallTodayBand />
 		</>
 	);
 }
@@ -168,27 +122,7 @@ function Services() {
 						Small to mid-size jobs with my tractor, truck, and dump trailer.
 					</p>
 				</div>
-				<div className="grid grid-cols-2 gap-3.5 md:grid-cols-3 md:gap-5 xl:grid-cols-5">
-					{services.map((service) => (
-						<article
-							key={service.title}
-							className="flex flex-col overflow-hidden rounded-[10px] border border-line bg-ground max-md:last:odd:col-span-2"
-						>
-							<img
-								src={service.image}
-								alt={service.alt}
-								loading="lazy"
-								className="block aspect-[4/3] w-full object-cover"
-							/>
-							<div className="flex flex-col gap-2 p-4.5 pb-5">
-								<h3 className="m-0 font-display text-[19px] font-extrabold font-stretch-expanded text-cream">
-									{service.title}
-								</h3>
-								<p className="m-0 text-base leading-snug">{service.blurb}</p>
-							</div>
-						</article>
-					))}
-				</div>
+				<ServiceGrid />
 			</div>
 		</section>
 	);
@@ -244,10 +178,9 @@ function WhyUs() {
 						</h3>
 						<p className="m-0 text-ink">Based in the {site.region} region.</p>
 						<ul className="m-0 mt-1 flex list-none flex-wrap gap-2 p-0">
-							{towns.map((town, i) => (
+							{site.serviceArea.map((town, i) => (
 								<li
-									// biome-ignore lint/suspicious/noArrayIndexKey: placeholder list, replaced with real towns
-									key={i}
+									key={town}
 									className={
 										i === 0
 											? "rounded-full bg-ground px-3 py-1.5 text-[15px] font-semibold text-gold"
@@ -259,44 +192,6 @@ function WhyUs() {
 							))}
 						</ul>
 					</div>
-				</div>
-			</div>
-		</section>
-	);
-}
-
-function CallToday() {
-	return (
-		<section
-			id="contact"
-			className={`${sectionX} bg-tractor py-20 text-ground md:py-24`}
-		>
-			<div
-				className={`${container} flex flex-wrap items-center justify-between gap-8`}
-			>
-				<div className="flex flex-col gap-2">
-					<p className="m-0 text-[15px] font-bold tracking-[0.14em] uppercase">
-						Free estimates
-					</p>
-					<h2 className="m-0 font-display text-[40px] leading-[1.05] font-extrabold font-stretch-expanded md:text-5xl">
-						Call today.
-					</h2>
-				</div>
-				<div className="flex flex-col items-start gap-3">
-					<a
-						href={site.phoneHref}
-						className="font-display text-4xl leading-[1.1] font-extrabold font-stretch-expanded text-ground no-underline md:text-[44px]"
-					>
-						{site.phone}
-					</a>
-					<a
-						href={site.facebookUrl}
-						target="_blank"
-						rel="noopener"
-						className="inline-flex min-h-11 items-center font-bold text-ground"
-					>
-						Or find me on Facebook →
-					</a>
 				</div>
 			</div>
 		</section>
