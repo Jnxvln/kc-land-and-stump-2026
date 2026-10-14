@@ -4,9 +4,9 @@ import { PhoneIcon } from "./PhoneIcon";
 
 const navItems = [
 	{ label: "Services", to: "/services" },
-	{ label: "Gallery", to: "/", hash: "work" },
-	{ label: "Service Area", to: "/", hash: "area" },
-	{ label: "Contact", to: "/", hash: "contact" },
+	{ label: "Gallery", to: "/gallery" },
+	{ label: "Service Area", to: "/contact", hash: "area" },
+	{ label: "Contact", to: "/contact" },
 ] as const;
 
 export function SiteHeader() {
