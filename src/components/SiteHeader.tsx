@@ -3,10 +3,10 @@ import { site } from "#/lib/site";
 import { PhoneIcon } from "./PhoneIcon";
 
 const navItems = [
-	{ label: "Services", hash: "services" },
-	{ label: "Gallery", hash: "work" },
-	{ label: "Service Area", hash: "area" },
-	{ label: "Contact", hash: "contact" },
+	{ label: "Services", to: "/services" },
+	{ label: "Gallery", to: "/", hash: "work" },
+	{ label: "Service Area", to: "/", hash: "area" },
+	{ label: "Contact", to: "/", hash: "contact" },
 ] as const;
 
 export function SiteHeader() {
@@ -26,9 +26,9 @@ export function SiteHeader() {
 				>
 					{navItems.map((item) => (
 						<Link
-							key={item.hash}
-							to="/"
-							hash={item.hash}
+							key={item.label}
+							to={item.to}
+							hash={"hash" in item ? item.hash : undefined}
 							className="text-gold no-underline hover:text-white"
 						>
 							{item.label}

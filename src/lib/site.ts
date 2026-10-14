@@ -6,4 +6,10 @@ export const site = {
 	facebookUrl: "https://www.facebook.com/profile.php?id=100085238665312",
 	foundedYear: 2023,
 	region: "Atlanta, TX",
+	serviceArea: [
+		"Atlanta, TX",
+		"Texarkana, TX",
+		"Queen City, TX",
+		"Redwater, TX",
+	],
 } as const;
