@@ -3,10 +3,7 @@ import { container, sectionX } from "#/lib/ui";
 
 export function CallTodayBand() {
 	return (
-		<section
-			id="contact"
-			className={`${sectionX} bg-tractor py-20 text-ground md:py-24`}
-		>
+		<section className={`${sectionX} bg-tractor py-20 text-ground md:py-24`}>
 			<div
 				className={`${container} flex flex-wrap items-center justify-between gap-8`}
 			>

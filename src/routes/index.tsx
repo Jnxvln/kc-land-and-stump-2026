@@ -1,41 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { CallTodayBand } from "#/components/CallTodayBand";
 import { PhoneIcon } from "#/components/PhoneIcon";
 import { ServiceGrid } from "#/components/ServiceCard";
+import { galleryPhotos } from "#/lib/gallery";
 import { site } from "#/lib/site";
 import { container, h2, sectionX } from "#/lib/ui";
 
 export const Route = createFileRoute("/")({
 	component: HomePage,
 });
-
-// Temporary: replaced by the newest uploads once the photo system exists.
-const recentWork = [
-	{
-		src: "/images/services/stump/stump-ckuh.webp",
-		alt: "Stump grinding job",
-	},
-	{
-		src: "/images/services/land/land-ijucu2.webp",
-		alt: "Land clearing job",
-	},
-	{
-		src: "/images/services/gravel/gravel-x81s.webp",
-		alt: "Gravel spreading job",
-	},
-	{
-		src: "/images/services/dirtwork/dirtwork-c9818.webp",
-		alt: "Dirt work job",
-	},
-	{
-		src: "/images/services/dirtwork/dirtwork-cia03.webp",
-		alt: "Dirt work job",
-	},
-	{
-		src: "/images/services/dirtwork/dirtwork-j381u.webp",
-		alt: "Dirt work job",
-	},
-] as const;
 
 const reasons = [
 	{
@@ -132,12 +105,22 @@ function RecentWork() {
 	return (
 		<section id="work" className={`${sectionX} py-16 md:py-22`}>
 			<div className={`${container} flex flex-col gap-9`}>
-				<div className="flex flex-col gap-2.5">
-					<h2 className={`${h2} text-cream`}>Fresh from the job site</h2>
-					<p className="m-0 text-muted">The newest photos from recent jobs.</p>
+				<div className="flex flex-wrap items-end justify-between gap-5">
+					<div className="flex flex-col gap-2.5">
+						<h2 className={`${h2} text-cream`}>Fresh from the job site</h2>
+						<p className="m-0 text-muted">
+							The newest photos from recent jobs.
+						</p>
+					</div>
+					<Link
+						to="/gallery"
+						className="inline-flex min-h-11 items-center font-bold text-tractor no-underline hover:underline"
+					>
+						View the full gallery →
+					</Link>
 				</div>
 				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-					{recentWork.map((photo) => (
+					{galleryPhotos.slice(0, 6).map((photo) => (
 						<img
 							key={photo.src}
 							src={photo.src}
