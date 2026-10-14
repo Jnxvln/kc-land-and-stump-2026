@@ -1,21 +1,16 @@
 import { Link } from "@tanstack/react-router";
+import { navItems } from "#/lib/nav";
 import { site } from "#/lib/site";
+import { MobileMenu } from "./MobileMenu";
 import { PhoneIcon } from "./PhoneIcon";
-
-const navItems = [
-	{ label: "Services", to: "/services" },
-	{ label: "Gallery", to: "/gallery" },
-	{ label: "Service Area", to: "/contact", hash: "area" },
-	{ label: "Contact", to: "/contact" },
-] as const;
 
 export function SiteHeader() {
 	return (
-		<header className="border-b border-line px-5 py-5 md:px-16">
-			<div className="mx-auto flex max-w-[1240px] items-center justify-between gap-6">
+		<header className="relative border-b border-line px-5 py-5 md:px-16">
+			<div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 sm:gap-6">
 				<Link
 					to="/"
-					className="text-outline font-display text-[26px] leading-none font-extrabold font-stretch-expanded whitespace-nowrap no-underline"
+					className="text-outline font-display text-[clamp(1.125rem,5.6vw,1.625rem)] leading-none font-extrabold font-stretch-expanded whitespace-nowrap no-underline"
 				>
 					KC LAND &amp; STUMP
 				</Link>
@@ -36,13 +31,17 @@ export function SiteHeader() {
 					))}
 				</nav>
 
-				<a
-					href={site.phoneHref}
-					className="hidden min-h-11 shrink-0 items-center gap-2.5 rounded-md bg-tractor px-5 py-3 font-bold whitespace-nowrap text-ground no-underline md:inline-flex"
-				>
-					<PhoneIcon />
-					{site.phone}
-				</a>
+				<div className="flex items-center gap-3">
+					<a
+						href={site.phoneHref}
+						className="hidden min-h-11 shrink-0 items-center gap-2.5 rounded-md bg-tractor px-5 py-3 font-bold whitespace-nowrap text-ground no-underline md:inline-flex"
+					>
+						<PhoneIcon />
+						{site.phone}
+					</a>
+
+					<MobileMenu />
+				</div>
 			</div>
 		</header>
 	);
