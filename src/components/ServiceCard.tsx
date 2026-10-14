@@ -14,7 +14,7 @@ export function ServiceCard({
 		<Link
 			to="/services/$slug"
 			params={{ slug: service.slug }}
-			className="group flex flex-col overflow-hidden rounded-[10px] border border-line bg-ground text-gold no-underline transition-colors hover:border-line-strong max-md:last:odd:col-span-2"
+			className="group flex flex-col overflow-hidden rounded-[10px] border border-line bg-ground text-gold no-underline transition-colors hover:border-line-strong min-[480px]:max-md:last:odd:col-span-2"
 		>
 			<img
 				src={service.cardImage.src}
@@ -37,7 +37,7 @@ export function ServiceCard({
 
 export function ServiceGrid({ headingAs }: { headingAs?: HeadingTag }) {
 	return (
-		<div className="grid grid-cols-2 gap-3.5 md:grid-cols-3 md:gap-5 xl:grid-cols-5">
+		<div className="grid grid-cols-1 gap-3.5 min-[480px]:grid-cols-2 md:grid-cols-3 md:gap-5 xl:grid-cols-5">
 			{services.map((service) => (
 				<ServiceCard
 					key={service.slug}
