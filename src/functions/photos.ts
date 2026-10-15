@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { prisma } from "#/db";
 import { MAX_UPLOAD_MB, photoKey } from "#/lib/photos";
 import { getService } from "#/lib/services";
+import { requireAdmin } from "#/server/auth";
 import { processPhoto } from "#/server/photo-processing";
 import { deleteObjects, putObject } from "#/server/storage";
 
@@ -26,9 +27,7 @@ export const uploadPhoto = createServerFn({ method: "POST" })
 		return { file, alt, serviceSlug };
 	})
 	.handler(async ({ data }) => {
-		// TEMPORARY: replaced by an admin session check once login exists.
-		if (process.env.ALLOW_DEV_UPLOADS !== "true")
-			throw new Error("Uploads are disabled.");
+		requireAdmin();
 
 		const processed = await processPhoto(
 			Buffer.from(await data.file.arrayBuffer()),

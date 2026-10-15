@@ -23,7 +23,8 @@
     "db:push": "dotenv -e .env.local -- prisma db push",
     "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
     "db:studio": "dotenv -e .env.local -- prisma studio",
-    "storage:check": "dotenv -e .env.local -- tsx scripts/storage-check.ts"
+    "storage:check": "dotenv -e .env.local -- tsx scripts/storage-check.ts",
+    "auth:hash": "tsx scripts/hash-password.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1151.0",
