@@ -9,15 +9,17 @@ export type ProcessedPhoto = {
 	height: number;
 };
 
-export async function processPhoto(input: Buffer): Promise<ProcessedPhoto> {
+export async function processPhoto(
+	input: Buffer,
+	rotateBy?: 90 | 270,
+): Promise<ProcessedPhoto> {
 	try {
-		// rotate() with no arguments applies the phone's orientation flag, so
-		// photos come out upright. sharp drops all metadata (EXIF, GPS, camera
-		// info) from its output unless told to keep it.
-		const base = sharp(input, {
+		const image = sharp(input, {
 			failOn: "error",
 			limitInputPixels: 60_000_000,
-		}).rotate();
+		});
+		// No angle: apply the phone's orientation flag. With an angle: rotate by that.
+		const base = rotateBy ? image.rotate(rotateBy) : image.rotate();
 
 		const [large, thumb] = await Promise.all([
 			base
