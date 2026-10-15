@@ -10,7 +10,7 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "vite dev --port 3000",
+    "dev": "pnpm db:generate && dotenv -e .env.local -- vite dev --port 3000",
     "generate-routes": "tsr generate",
     "build": "prisma generate && vite build",
     "preview": "vite preview",
@@ -38,6 +38,7 @@
     "prisma": "^7.4.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as DevUploadRouteImport } from './routes/dev/upload'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as ServicesSlugRouteImport } from './routes/services/$slug'
 
@@ -30,6 +31,11 @@ const GalleryRoute = GalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DevUploadRoute = DevUploadRouteImport.update({
+  id: '/dev/upload',
+  path: '/dev/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesIndexRoute = ServicesIndexRouteImport.update({
   id: '/services/',
   path: '/services/',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/dev/upload': typeof DevUploadRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/services/': typeof ServicesIndexRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/dev/upload': typeof DevUploadRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/services': typeof ServicesIndexRoute
 }
@@ -60,19 +68,33 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/dev/upload': typeof DevUploadRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/services/': typeof ServicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contact' | '/gallery' | '/services/$slug' | '/services/'
+  fullPaths:
+    | '/'
+    | '/contact'
+    | '/gallery'
+    | '/dev/upload'
+    | '/services/$slug'
+    | '/services/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contact' | '/gallery' | '/services/$slug' | '/services'
+  to:
+    | '/'
+    | '/contact'
+    | '/gallery'
+    | '/dev/upload'
+    | '/services/$slug'
+    | '/services'
   id:
     | '__root__'
     | '/'
     | '/contact'
     | '/gallery'
+    | '/dev/upload'
     | '/services/$slug'
     | '/services/'
   fileRoutesById: FileRoutesById
@@ -81,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactRoute: typeof ContactRoute
   GalleryRoute: typeof GalleryRoute
+  DevUploadRoute: typeof DevUploadRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
 }
@@ -108,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dev/upload': {
+      id: '/dev/upload'
+      path: '/dev/upload'
+      fullPath: '/dev/upload'
+      preLoaderRoute: typeof DevUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services/': {
       id: '/services/'
       path: '/services'
@@ -129,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactRoute: ContactRoute,
   GalleryRoute: GalleryRoute,
+  DevUploadRoute: DevUploadRoute,
   ServicesSlugRoute: ServicesSlugRoute,
   ServicesIndexRoute: ServicesIndexRoute,
 }
