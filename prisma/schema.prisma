@@ -7,8 +7,19 @@ datasource db {
   provider = "postgresql"
 }
 
-model Todo {
-  id        Int      @id @default(autoincrement())
-  title     String
-  createdAt DateTime @default(now())
+model Photo {
+  id          String   @id @default(cuid())
+  width       Int
+  height      Int
+  alt         String   @default("")
+  caption     String?
+  visible     Boolean  @default(true)
+  placement   String?  @unique
+  serviceSlug String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([visible, createdAt])
+  @@index([serviceSlug])
 }
