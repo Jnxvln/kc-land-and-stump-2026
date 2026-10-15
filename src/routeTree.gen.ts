@@ -10,15 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as GalleryRouteImport } from './routes/gallery'
-import { Route as DevUploadRouteImport } from './routes/dev/upload'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as ServicesSlugRouteImport } from './routes/services/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -31,10 +38,15 @@ const GalleryRoute = GalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DevUploadRoute = DevUploadRouteImport.update({
-  id: '/dev/upload',
-  path: '/dev/upload',
-  getParentRoute: () => rootRouteImport,
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const ServicesIndexRoute = ServicesIndexRouteImport.update({
   id: '/services/',
@@ -49,61 +61,71 @@ const ServicesSlugRoute = ServicesSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
-  '/dev/upload': typeof DevUploadRoute
+  '/admin/login': typeof AdminLoginRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/services/': typeof ServicesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
-  '/dev/upload': typeof DevUploadRoute
+  '/admin/login': typeof AdminLoginRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/services': typeof ServicesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
-  '/dev/upload': typeof DevUploadRoute
+  '/admin/login': typeof AdminLoginRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/services/': typeof ServicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/contact'
     | '/gallery'
-    | '/dev/upload'
+    | '/admin/login'
     | '/services/$slug'
+    | '/admin/'
     | '/services/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/contact'
     | '/gallery'
-    | '/dev/upload'
+    | '/admin/login'
     | '/services/$slug'
+    | '/admin'
     | '/services'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/contact'
     | '/gallery'
-    | '/dev/upload'
+    | '/admin/login'
     | '/services/$slug'
+    | '/admin/'
     | '/services/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   ContactRoute: typeof ContactRoute
   GalleryRoute: typeof GalleryRoute
-  DevUploadRoute: typeof DevUploadRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
 }
@@ -115,6 +137,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -131,12 +160,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dev/upload': {
-      id: '/dev/upload'
-      path: '/dev/upload'
-      fullPath: '/dev/upload'
-      preLoaderRoute: typeof DevUploadRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/services/': {
       id: '/services/'
@@ -155,11 +191,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminLoginRoute: AdminLoginRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   ContactRoute: ContactRoute,
   GalleryRoute: GalleryRoute,
-  DevUploadRoute: DevUploadRoute,
   ServicesSlugRoute: ServicesSlugRoute,
   ServicesIndexRoute: ServicesIndexRoute,
 }
