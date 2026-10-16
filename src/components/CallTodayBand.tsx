@@ -1,7 +1,10 @@
 import { site } from "#/lib/site";
 import { container, sectionX } from "#/lib/ui";
+import { useSiteSettings } from "#/lib/use-site-settings";
 
 export function CallTodayBand() {
+	const { phone, phoneHref } = useSiteSettings();
+
 	return (
 		<section className={`${sectionX} bg-tractor py-20 text-ground md:py-24`}>
 			<div
@@ -17,10 +20,10 @@ export function CallTodayBand() {
 				</div>
 				<div className="flex flex-col items-start gap-3">
 					<a
-						href={site.phoneHref}
+						href={phoneHref}
 						className="font-display text-4xl leading-[1.1] font-extrabold font-stretch-expanded text-ground no-underline md:text-[44px]"
 					>
-						{site.phone}
+						{phone}
 					</a>
 					<a
 						href={site.facebookUrl}

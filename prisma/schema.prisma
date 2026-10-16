@@ -31,3 +31,10 @@ model PhotoPlacement {
 
   @@index([photoId])
 }
+
+model SiteSettings {
+  id          Int      @id @default(1)
+  phone       String
+  serviceArea String[]
+  updatedAt   DateTime @updatedAt
+}

@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useId, useRef, useState } from "react";
 import { navItems } from "#/lib/nav";
-import { site } from "#/lib/site";
+import { useSiteSettings } from "#/lib/use-site-settings";
 import { PhoneIcon } from "./PhoneIcon";
 
 export function MobileMenu() {
 	const [open, setOpen] = useState(false);
+	const { phone, phoneHref } = useSiteSettings();
 	const buttonRef = useRef<HTMLButtonElement>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const panelId = useId();
@@ -84,11 +85,11 @@ export function MobileMenu() {
 					</ul>
 				</nav>
 				<a
-					href={site.phoneHref}
+					href={phoneHref}
 					className="mt-5 flex min-h-12 items-center justify-center gap-2.5 rounded-md bg-tractor p-3.5 text-lg font-bold text-ground no-underline"
 				>
 					<PhoneIcon size={20} />
-					Call {site.phone}
+					Call {phone}
 				</a>
 			</div>
 		</div>

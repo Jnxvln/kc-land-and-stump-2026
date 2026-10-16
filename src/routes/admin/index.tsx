@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { BusinessInfoForm } from "#/components/admin/BusinessInfoForm";
 import { PhotoEditor } from "#/components/admin/PhotoEditor";
 import { PhotoUploader } from "#/components/admin/PhotoUploader";
 import { logout } from "#/functions/auth";
@@ -38,6 +39,7 @@ function AdminPage() {
 				</button>
 			</div>
 
+			<BusinessInfoForm />
 			<PhotoUploader />
 
 			<section className="flex flex-col gap-4">
