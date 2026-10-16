@@ -4,6 +4,7 @@ import { PhoneIcon } from "#/components/PhoneIcon";
 import { ServiceGrid } from "#/components/ServiceCard";
 import { getFeaturedPhotos, getGalleryPhotos } from "#/functions/public-photos";
 import { type GalleryPhoto, staticGalleryPhotos } from "#/lib/gallery";
+import { seo } from "#/lib/seo";
 import { site } from "#/lib/site";
 import { container, h2, sectionX } from "#/lib/ui";
 import { useSiteSettings } from "#/lib/use-site-settings";
@@ -19,6 +20,12 @@ export const Route = createFileRoute("/")({
 			recent: recent.length > 0 ? recent : staticGalleryPhotos.slice(0, 6),
 		};
 	},
+	head: () =>
+		seo({
+			title: `${site.name} | Stump Grinding & Land Clearing in ${site.region}`,
+			description: `Stump grinding, land clearing, bush hogging, gravel spreading, and hauling around ${site.region}. Free estimates.`,
+			path: "/",
+		}),
 	component: HomePage,
 });
 

@@ -21,6 +21,7 @@ const config = defineConfig({
 					route: "/photos/:id/:variant",
 					handler: "./src/server/photo-route.ts",
 				},
+				{ route: "/sitemap.xml", handler: "./src/server/sitemap.ts" },
 			],
 		}),
 		tailwindcss(),

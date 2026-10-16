@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { CallTodayBand } from "#/components/CallTodayBand";
 import { PhotoGallery } from "#/components/PhotoGallery";
 import { getGalleryPhotos } from "#/functions/public-photos";
+import { seo } from "#/lib/seo";
 import { getService, services } from "#/lib/services";
 import { site } from "#/lib/site";
 import { container, sectionX } from "#/lib/ui";
@@ -15,14 +16,14 @@ export const Route = createFileRoute("/services/$slug")({
 		});
 		return { service, photos };
 	},
-	head: ({ loaderData }) => ({
-		meta: loaderData
-			? [
-					{ title: `${loaderData.service.title} | ${site.name}` },
-					{ name: "description", content: loaderData.service.blurb },
-				]
-			: [],
-	}),
+	head: ({ loaderData }) =>
+		loaderData
+			? seo({
+					title: `${loaderData.service.title} | ${site.name}`,
+					description: loaderData.service.blurb,
+					path: `/services/${loaderData.service.slug}`,
+				})
+			: {},
 	component: ServicePage,
 });
 
