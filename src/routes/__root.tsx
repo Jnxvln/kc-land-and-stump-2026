@@ -6,11 +6,12 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { AdminShortcut } from "#/components/AdminShortcut";
 import { MobileCallBar } from "#/components/MobileCallBar";
+import { ScrollToTop } from "#/components/ScrollToTop";
 import { SiteFooter } from "#/components/SiteFooter";
 import { SiteHeader } from "#/components/SiteHeader";
 import { site } from "#/lib/site";
-
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -49,6 +50,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<main className="flex-1">{children}</main>
 				<SiteFooter />
 				<MobileCallBar />
+				<AdminShortcut />
+				<ScrollToTop />
 				<TanStackDevtools
 					config={{ position: "bottom-right" }}
 					plugins={[

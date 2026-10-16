@@ -8,6 +8,7 @@ import {
 import { verifyPassword } from "./password";
 
 const COOKIE = "kc_admin";
+const HINT_COOKIE = "kc_admin_hint";
 const SESSION_DAYS = 30;
 const MAX_FAILURES = 5;
 const LOCKOUT_MS = 15 * 60 * 1000;
@@ -42,10 +43,20 @@ export function startSession(): void {
 		path: "/",
 		maxAge,
 	});
+	// Not a credential: only tells the public pages to show the admin shortcut.
+	// The httpOnly session cookie is still what actually grants access.
+	setCookie(HINT_COOKIE, "1", {
+		httpOnly: false,
+		secure: process.env.NODE_ENV !== "development",
+		sameSite: "lax",
+		path: "/",
+		maxAge,
+	});
 }
 
 export function endSession(): void {
 	deleteCookie(COOKIE, { path: "/" });
+	deleteCookie(HINT_COOKIE, { path: "/" });
 }
 
 export function isAdminRequest(): boolean {
