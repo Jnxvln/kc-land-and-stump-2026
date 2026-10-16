@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CallTodayBand } from "#/components/CallTodayBand";
 import { ServiceGrid } from "#/components/ServiceCard";
+import { getFeaturedPhotos } from "#/functions/public-photos";
 import { site } from "#/lib/site";
 import { container, sectionX } from "#/lib/ui";
 
 export const Route = createFileRoute("/services/")({
+	loader: () => getFeaturedPhotos(),
 	head: () => ({
 		meta: [
 			{ title: `Services | ${site.name}` },
@@ -18,6 +20,7 @@ export const Route = createFileRoute("/services/")({
 });
 
 function ServicesPage() {
+	const featured = Route.useLoaderData();
 	return (
 		<>
 			<section className={`${sectionX} pt-14 pb-16 md:pt-20 md:pb-22`}>
@@ -31,7 +34,7 @@ function ServicesPage() {
 							around {site.region} and nearby.
 						</p>
 					</div>
-					<ServiceGrid headingAs="h2" />
+					<ServiceGrid headingAs="h2" featured={featured} />
 				</div>
 			</section>
 			<CallTodayBand />

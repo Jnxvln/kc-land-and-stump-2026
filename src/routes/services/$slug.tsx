@@ -1,14 +1,19 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { CallTodayBand } from "#/components/CallTodayBand";
+import { PhotoGallery } from "#/components/PhotoGallery";
+import { getGalleryPhotos } from "#/functions/public-photos";
 import { getService, services } from "#/lib/services";
 import { site } from "#/lib/site";
 import { container, sectionX } from "#/lib/ui";
 
 export const Route = createFileRoute("/services/$slug")({
-	loader: ({ params }) => {
+	loader: async ({ params }) => {
 		const service = getService(params.slug);
 		if (!service) throw notFound();
-		return { service };
+		const photos = await getGalleryPhotos({
+			data: { serviceSlug: service.slug, limit: 8 },
+		});
+		return { service, photos };
 	},
 	head: ({ loaderData }) => ({
 		meta: loaderData
@@ -22,7 +27,7 @@ export const Route = createFileRoute("/services/$slug")({
 });
 
 function ServicePage() {
-	const { service } = Route.useLoaderData();
+	const { service, photos } = Route.useLoaderData();
 	const otherServices = services.filter((s) => s.slug !== service.slug);
 
 	return (
@@ -74,6 +79,17 @@ function ServicePage() {
 					))}
 				</div>
 			</section>
+
+			{photos.length > 0 && (
+				<section className={`${sectionX} pb-16 md:pb-22`}>
+					<div className={`${container} flex flex-col gap-6`}>
+						<h2 className="m-0 font-display text-[28px] font-extrabold font-stretch-expanded text-cream">
+							Recent {service.title.toLowerCase()} jobs
+						</h2>
+						<PhotoGallery photos={photos} />
+					</div>
+				</section>
+			)}
 
 			<section className={`${sectionX} border-t border-line py-12`}>
 				<div className={`${container} flex flex-col gap-4`}>

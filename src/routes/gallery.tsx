@@ -1,11 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CallTodayBand } from "#/components/CallTodayBand";
 import { PhotoGallery } from "#/components/PhotoGallery";
-import { galleryPhotos } from "#/lib/gallery";
+import { getGalleryPhotos } from "#/functions/public-photos";
+import { staticGalleryPhotos } from "#/lib/gallery";
 import { site } from "#/lib/site";
 import { container, sectionX } from "#/lib/ui";
 
 export const Route = createFileRoute("/gallery")({
+	loader: async () => {
+		const photos = await getGalleryPhotos();
+		return { photos: photos.length > 0 ? photos : staticGalleryPhotos };
+	},
 	head: () => ({
 		meta: [
 			{ title: `Gallery | ${site.name}` },
@@ -19,6 +24,7 @@ export const Route = createFileRoute("/gallery")({
 });
 
 function GalleryPage() {
+	const { photos } = Route.useLoaderData();
 	return (
 		<>
 			<section className={`${sectionX} pt-14 pb-16 md:pt-20 md:pb-22`}>
@@ -31,7 +37,7 @@ function GalleryPage() {
 							Photos from recent jobs. Tap any photo to see it full size.
 						</p>
 					</div>
-					<PhotoGallery photos={galleryPhotos} />
+					<PhotoGallery photos={photos} />
 				</div>
 			</section>
 			<CallTodayBand />

@@ -1,13 +1,16 @@
 import { Link } from "@tanstack/react-router";
+import type { GalleryPhoto } from "#/lib/gallery";
 import { type Service, services } from "#/lib/services";
 
 type HeadingTag = "h2" | "h3";
 
 export function ServiceCard({
 	service,
+	photo,
 	headingAs: Heading = "h3",
 }: {
 	service: Service;
+	photo?: GalleryPhoto;
 	headingAs?: HeadingTag;
 }) {
 	return (
@@ -17,8 +20,8 @@ export function ServiceCard({
 			className="group flex flex-col overflow-hidden rounded-[10px] border border-line bg-ground text-gold no-underline transition-colors hover:border-line-strong min-[480px]:max-md:last:odd:col-span-2"
 		>
 			<img
-				src={service.cardImage.src}
-				alt={service.cardImage.alt}
+				src={photo?.thumb ?? service.cardImage.src}
+				alt={photo?.alt ?? service.cardImage.alt}
 				loading="lazy"
 				className="block aspect-[4/3] w-full object-cover"
 			/>
@@ -35,13 +38,20 @@ export function ServiceCard({
 	);
 }
 
-export function ServiceGrid({ headingAs }: { headingAs?: HeadingTag }) {
+export function ServiceGrid({
+	headingAs,
+	featured,
+}: {
+	headingAs?: HeadingTag;
+	featured?: Record<string, GalleryPhoto>;
+}) {
 	return (
 		<div className="grid grid-cols-1 gap-3.5 min-[480px]:grid-cols-2 md:grid-cols-3 md:gap-5 xl:grid-cols-5">
 			{services.map((service) => (
 				<ServiceCard
 					key={service.slug}
 					service={service}
+					photo={featured?.[`service-${service.slug}`]}
 					headingAs={headingAs}
 				/>
 			))}

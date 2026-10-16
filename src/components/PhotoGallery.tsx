@@ -22,14 +22,14 @@ export function PhotoGallery({ photos }: { photos: GalleryPhoto[] }) {
 		<>
 			<ul className="m-0 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-3 lg:grid-cols-4">
 				{photos.map((photo, i) => (
-					<li key={photo.src}>
+					<li key={photo.key}>
 						<button
 							type="button"
 							onClick={() => show(i)}
 							className="block w-full cursor-zoom-in overflow-hidden rounded-lg border-0 bg-card p-0"
 						>
 							<img
-								src={photo.src}
+								src={photo.thumb}
 								alt={photo.alt}
 								loading="lazy"
 								className="block aspect-square w-full object-cover transition-transform duration-300 hover:scale-105"
@@ -56,7 +56,7 @@ export function PhotoGallery({ photos }: { photos: GalleryPhoto[] }) {
 				{current && index !== null && (
 					<figure className="m-0 flex flex-col items-center gap-3">
 						<img
-							src={current.src}
+							src={current.full}
 							alt={current.alt}
 							className="block max-h-[78dvh] max-w-[92vw] rounded-lg object-contain"
 						/>
