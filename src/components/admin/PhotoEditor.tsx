@@ -66,10 +66,14 @@ export function PhotoEditor({
 	}
 
 	return (
+		// biome-ignore lint/a11y/useKeyWithClickEvents: backdrop click mirrors the native Escape-to-close of <dialog>
 		<dialog
 			ref={dialogRef}
 			aria-label="Edit photo"
 			onClose={onClose}
+			onCancel={(e) => {
+				if (busy) e.preventDefault();
+			}}
 			onClick={(e) => {
 				if (e.target === e.currentTarget && !busy) onClose();
 			}}
