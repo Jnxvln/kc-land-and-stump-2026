@@ -33,7 +33,7 @@ function requireId(data: { id?: unknown }): string {
 export const listPhotos = createServerFn({ method: "GET" }).handler(
 	async () => {
 		requireAdmin();
-		return prisma.photo.findMany({
+		const photos = await prisma.photo.findMany({
 			orderBy: { createdAt: "desc" },
 			select: {
 				id: true,
@@ -41,11 +41,15 @@ export const listPhotos = createServerFn({ method: "GET" }).handler(
 				height: true,
 				alt: true,
 				visible: true,
-				placement: true,
 				serviceSlug: true,
 				createdAt: true,
+				placements: { select: { spot: true } },
 			},
 		});
+		return photos.map(({ placements, ...photo }) => ({
+			...photo,
+			spots: placements.map((p) => p.spot),
+		}));
 	},
 );
 
@@ -102,7 +106,7 @@ type PhotoUpdate = {
 	alt?: string;
 	visible?: boolean;
 	serviceSlug?: string | null;
-	placement?: string | null;
+	spots?: string[];
 };
 
 export const updatePhoto = createServerFn({ method: "POST" })
@@ -118,24 +122,36 @@ export const updatePhoto = createServerFn({ method: "POST" })
 				throw new Error("Unknown service.");
 			update.serviceSlug = data.serviceSlug;
 		}
-		if (data.placement !== undefined) {
-			if (data.placement !== null && !isPlacement(data.placement))
+		if (data.spots !== undefined) {
+			if (
+				!Array.isArray(data.spots) ||
+				!data.spots.every((s) => typeof s === "string" && isPlacement(s))
+			) {
 				throw new Error("Unknown placement.");
-			update.placement = data.placement;
+			}
+			update.spots = [...new Set(data.spots)];
 		}
 		return { id, update };
 	})
 	.handler(async ({ data }) => {
 		requireAdmin();
+		const { spots, ...fields } = data.update;
+
 		await prisma.$transaction(async (tx) => {
-			// Each spot holds one photo: assigning it here takes it from whichever photo had it.
-			if (data.update.placement) {
-				await tx.photo.updateMany({
-					where: { placement: data.update.placement, NOT: { id: data.id } },
-					data: { placement: null },
+			await tx.photo.update({ where: { id: data.id }, data: fields });
+
+			if (spots) {
+				// Clear this photo's old spots, and free the chosen spots from any other
+				// photo, then assign the chosen spots to this photo.
+				await tx.photoPlacement.deleteMany({
+					where: { OR: [{ photoId: data.id }, { spot: { in: spots } }] },
 				});
+				if (spots.length > 0) {
+					await tx.photoPlacement.createMany({
+						data: spots.map((spot) => ({ spot, photoId: data.id })),
+					});
+				}
 			}
-			await tx.photo.update({ where: { id: data.id }, data: data.update });
 		});
 		return { ok: true };
 	});
@@ -168,6 +184,7 @@ export const rotatePhoto = createServerFn({ method: "POST" })
 		requireAdmin();
 		const photo = await prisma.photo.findUniqueOrThrow({
 			where: { id: data.id },
+			include: { placements: { select: { spot: true } } },
 		});
 
 		const object = await getObject(photoKey(photo.id, "large"));
@@ -194,7 +211,9 @@ export const rotatePhoto = createServerFn({ method: "POST" })
 						alt: photo.alt,
 						caption: photo.caption,
 						visible: photo.visible,
-						placement: photo.placement,
+						placements: {
+							create: photo.placements.map((p) => ({ spot: p.spot })),
+						},
 						serviceSlug: photo.serviceSlug,
 						sortOrder: photo.sortOrder,
 						createdAt: photo.createdAt,

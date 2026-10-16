@@ -14,12 +14,20 @@ model Photo {
   alt         String   @default("")
   caption     String?
   visible     Boolean  @default(true)
-  placement   String?  @unique
   serviceSlug String?
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  placements  PhotoPlacement[]
 
   @@index([visible, createdAt])
   @@index([serviceSlug])
+}
+
+model PhotoPlacement {
+  spot    String @id
+  photoId String
+  photo   Photo  @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+  @@index([photoId])
 }

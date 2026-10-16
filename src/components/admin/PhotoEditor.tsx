@@ -60,7 +60,7 @@ export function PhotoEditor({
 			alt: String(form.get("alt") ?? ""),
 			visible: form.get("visible") === "on",
 			serviceSlug: String(form.get("serviceSlug") ?? "") || null,
-			placement: String(form.get("placement") ?? "") || null,
+			spots: form.getAll("spots").map(String),
 		};
 		void run("save", () => updatePhoto({ data }));
 	}
@@ -137,21 +137,29 @@ export function PhotoEditor({
 						</select>
 					</label>
 
-					<label className="flex flex-col gap-2 font-semibold">
-						Feature this photo
-						<select
-							name="placement"
-							defaultValue={photo.placement ?? ""}
-							className={field}
-						>
-							<option value="">Not featured</option>
-							{PLACEMENTS.map((p) => (
-								<option key={p.id} value={p.id}>
-									{p.label}
-								</option>
-							))}
-						</select>
-					</label>
+					<fieldset className="m-0 flex flex-col gap-1 border-0 p-0">
+						<legend className="mb-2 p-0 font-semibold">
+							Feature this photo
+						</legend>
+						{PLACEMENTS.map((p) => (
+							<label
+								key={p.id}
+								className="flex min-h-11 cursor-pointer items-center gap-3"
+							>
+								<input
+									type="checkbox"
+									name="spots"
+									value={p.id}
+									defaultChecked={photo.spots.includes(p.id)}
+									className="size-5 accent-tractor"
+								/>
+								{p.label}
+							</label>
+						))}
+						<p className="m-0 mt-1 text-[15px] text-muted">
+							Each spot shows one photo. Checking a spot moves it to this photo.
+						</p>
+					</fieldset>
 
 					{error && (
 						<p role="alert" className="m-0 font-semibold text-tractor">
