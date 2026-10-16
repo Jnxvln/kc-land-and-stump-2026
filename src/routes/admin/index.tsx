@@ -71,11 +71,14 @@ function AdminPage() {
 													Hidden
 												</span>
 											)}
-											{photo.placement && (
-												<span className={`${badge} bg-tractor text-ground`}>
-													★ {placementShort(photo.placement)}
+											{photo.spots.map((spot) => (
+												<span
+													key={spot}
+													className={`${badge} bg-tractor text-ground`}
+												>
+													★ {placementShort(spot)}
 												</span>
-											)}
+											))}
 										</span>
 									</button>
 								</li>

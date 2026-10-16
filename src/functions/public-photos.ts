@@ -48,12 +48,12 @@ export const getGalleryPhotos = createServerFn({ method: "GET" })
 /** Visible photos featured in a spot, keyed by spot id (e.g. "home-hero"). */
 export const getFeaturedPhotos = createServerFn({ method: "GET" }).handler(
 	async () => {
-		const photos = await prisma.photo.findMany({
-			where: { visible: true, placement: { not: null } },
-			select: { ...publicFields, placement: true },
+		const rows = await prisma.photoPlacement.findMany({
+			where: { photo: { visible: true } },
+			select: { spot: true, photo: { select: publicFields } },
 		});
 		return Object.fromEntries(
-			photos.map((photo) => [photo.placement as string, toGalleryPhoto(photo)]),
+			rows.map((row) => [row.spot, toGalleryPhoto(row.photo)]),
 		) as Record<string, GalleryPhoto>;
 	},
 );
