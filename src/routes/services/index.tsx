@@ -2,20 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CallTodayBand } from "#/components/CallTodayBand";
 import { ServiceGrid } from "#/components/ServiceCard";
 import { getFeaturedPhotos } from "#/functions/public-photos";
+import { seo } from "#/lib/seo";
 import { site } from "#/lib/site";
 import { container, sectionX } from "#/lib/ui";
 
 export const Route = createFileRoute("/services/")({
 	loader: () => getFeaturedPhotos(),
-	head: () => ({
-		meta: [
-			{ title: `Services | ${site.name}` },
-			{
-				name: "description",
-				content: `Stump grinding, land clearing, dirt work, gravel spreading, and hauling around ${site.region}.`,
-			},
-		],
-	}),
+	head: () =>
+		seo({
+			title: `Services | ${site.name}`,
+			description: `Stump grinding, land clearing, dirt work, gravel spreading, and hauling around ${site.region}.`,
+			path: "/services",
+		}),
 	component: ServicesPage,
 });
 

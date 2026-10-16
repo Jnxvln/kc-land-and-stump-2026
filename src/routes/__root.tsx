@@ -12,6 +12,7 @@ import { ScrollToTop } from "#/components/ScrollToTop";
 import { SiteFooter } from "#/components/SiteFooter";
 import { SiteHeader } from "#/components/SiteHeader";
 import { getSiteSettings } from "#/functions/settings";
+import { localBusinessJsonLd } from "#/lib/seo";
 import { site } from "#/lib/site";
 import appCss from "../styles.css?url";
 
@@ -20,7 +21,7 @@ export const Route = createRootRoute({
 	// Settings rarely change, so don't refetch on every client-side navigation.
 	// Saving in the admin calls router.invalidate(), which refreshes immediately.
 	staleTime: 5 * 60 * 1000,
-	head: () => ({
+	head: ({ loaderData }) => ({
 		meta: [
 			{ charSet: "utf-8" },
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -39,6 +40,14 @@ export const Route = createRootRoute({
 			},
 			{ rel: "stylesheet", href: appCss },
 		],
+		scripts: loaderData
+			? [
+					{
+						type: "application/ld+json",
+						children: localBusinessJsonLd(loaderData),
+					},
+				]
+			: [],
 	}),
 	shellComponent: RootDocument,
 	notFoundComponent: NotFound,

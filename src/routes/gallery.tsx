@@ -3,6 +3,7 @@ import { CallTodayBand } from "#/components/CallTodayBand";
 import { PhotoGallery } from "#/components/PhotoGallery";
 import { getGalleryPhotos } from "#/functions/public-photos";
 import { staticGalleryPhotos } from "#/lib/gallery";
+import { seo } from "#/lib/seo";
 import { site } from "#/lib/site";
 import { container, sectionX } from "#/lib/ui";
 
@@ -11,15 +12,12 @@ export const Route = createFileRoute("/gallery")({
 		const photos = await getGalleryPhotos();
 		return { photos: photos.length > 0 ? photos : staticGalleryPhotos };
 	},
-	head: () => ({
-		meta: [
-			{ title: `Gallery | ${site.name}` },
-			{
-				name: "description",
-				content: `Photos of recent stump grinding, land clearing, gravel, and hauling jobs around ${site.region}.`,
-			},
-		],
-	}),
+	head: () =>
+		seo({
+			title: `Gallery | ${site.name}`,
+			description: `Photos of recent stump grinding, land clearing, gravel, and hauling jobs around ${site.region}.`,
+			path: "/gallery",
+		}),
 	component: GalleryPage,
 });
 

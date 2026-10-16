@@ -1,25 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PhoneIcon } from "#/components/PhoneIcon";
 import { getSiteSettings } from "#/functions/settings";
+import { seo } from "#/lib/seo";
 import { site } from "#/lib/site";
 import { container, sectionX } from "#/lib/ui";
 import { useSiteSettings } from "#/lib/use-site-settings";
 
 export const Route = createFileRoute("/contact")({
 	loader: () => getSiteSettings(),
-	head: ({ loaderData }) => ({
-		meta: [
-			{ title: `Contact | ${site.name}` },
-			...(loaderData
-				? [
-						{
-							name: "description",
-							content: `Call ${loaderData.phone} for a free estimate. Serving ${loaderData.serviceArea.join(", ")}.`,
-						},
-					]
-				: []),
-		],
-	}),
+	head: ({ loaderData }) =>
+		seo({
+			title: `Contact | ${site.name}`,
+			description: loaderData
+				? `Call ${loaderData.phone} for a free estimate. Serving ${loaderData.serviceArea.join(", ")}.`
+				: `Call for a free estimate in the ${site.region} region.`,
+			path: "/contact",
+		}),
+
 	component: ContactPage,
 });
 
