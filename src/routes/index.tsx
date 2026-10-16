@@ -2,11 +2,22 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CallTodayBand } from "#/components/CallTodayBand";
 import { PhoneIcon } from "#/components/PhoneIcon";
 import { ServiceGrid } from "#/components/ServiceCard";
-import { galleryPhotos } from "#/lib/gallery";
+import { getFeaturedPhotos, getGalleryPhotos } from "#/functions/public-photos";
+import { type GalleryPhoto, staticGalleryPhotos } from "#/lib/gallery";
 import { site } from "#/lib/site";
 import { container, h2, sectionX } from "#/lib/ui";
 
 export const Route = createFileRoute("/")({
+	loader: async () => {
+		const [featured, recent] = await Promise.all([
+			getFeaturedPhotos(),
+			getGalleryPhotos({ data: { limit: 6 } }),
+		]);
+		return {
+			featured,
+			recent: recent.length > 0 ? recent : staticGalleryPhotos.slice(0, 6),
+		};
+	},
 	component: HomePage,
 });
 
@@ -22,18 +33,19 @@ const reasons = [
 ] as const;
 
 function HomePage() {
+	const { featured, recent } = Route.useLoaderData();
 	return (
 		<>
-			<Hero />
-			<Services />
-			<RecentWork />
+			<Hero photo={featured["home-hero"]} />
+			<Services featured={featured} />
+			<RecentWork photos={recent} />
 			<WhyUs />
 			<CallTodayBand />
 		</>
 	);
 }
 
-function Hero() {
+function Hero({ photo }: { photo?: GalleryPhoto }) {
 	return (
 		<section id="top" className={`${sectionX} pt-14 pb-16 md:pt-22 md:pb-24`}>
 			<div
@@ -68,21 +80,30 @@ function Hero() {
 					</div>
 				</div>
 				<div className="overflow-hidden rounded-[10px] border border-line bg-card">
-					<img
-						src="/images/brand/banner.webp"
-						alt="KC Land & Stump's Kubota tractor"
-						width={960}
-						height={359}
-						className="block h-auto w-full"
-						fetchPriority="high"
-					/>
+					{photo ? (
+						<img
+							src={photo.full}
+							alt={photo.alt}
+							fetchPriority="high"
+							className="block aspect-[4/3] w-full object-cover"
+						/>
+					) : (
+						<img
+							src="/images/brand/banner.webp"
+							alt="KC Land & Stump's Kubota tractor"
+							width={960}
+							height={359}
+							fetchPriority="high"
+							className="block h-auto w-full"
+						/>
+					)}
 				</div>
 			</div>
 		</section>
 	);
 }
 
-function Services() {
+function Services({ featured }: { featured: Record<string, GalleryPhoto> }) {
 	return (
 		<section
 			id="services"
@@ -95,13 +116,13 @@ function Services() {
 						Small to mid-size jobs with my tractor, truck, and dump trailer.
 					</p>
 				</div>
-				<ServiceGrid />
+				<ServiceGrid featured={featured} />
 			</div>
 		</section>
 	);
 }
 
-function RecentWork() {
+function RecentWork({ photos }: { photos: GalleryPhoto[] }) {
 	return (
 		<section id="work" className={`${sectionX} py-16 md:py-22`}>
 			<div className={`${container} flex flex-col gap-9`}>
@@ -120,10 +141,10 @@ function RecentWork() {
 					</Link>
 				</div>
 				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-					{galleryPhotos.slice(0, 6).map((photo) => (
+					{photos.map((photo) => (
 						<img
-							key={photo.src}
-							src={photo.src}
+							key={photo.key}
+							src={photo.thumb}
 							alt={photo.alt}
 							loading="lazy"
 							className="block aspect-square w-full rounded-lg object-cover"
