@@ -6,6 +6,7 @@ import { getFeaturedPhotos, getGalleryPhotos } from "#/functions/public-photos";
 import { type GalleryPhoto, staticGalleryPhotos } from "#/lib/gallery";
 import { site } from "#/lib/site";
 import { container, h2, sectionX } from "#/lib/ui";
+import { useSiteSettings } from "#/lib/use-site-settings";
 
 export const Route = createFileRoute("/")({
 	loader: async () => {
@@ -46,6 +47,7 @@ function HomePage() {
 }
 
 function Hero({ photo }: { photo?: GalleryPhoto }) {
+	const { phoneHref } = useSiteSettings();
 	return (
 		<section id="top" className={`${sectionX} pt-14 pb-16 md:pt-22 md:pb-24`}>
 			<div
@@ -65,7 +67,7 @@ function Hero({ photo }: { photo?: GalleryPhoto }) {
 					</p>
 					<div className="mt-2 flex flex-wrap gap-3.5">
 						<a
-							href={site.phoneHref}
+							href={phoneHref}
 							className="inline-flex min-h-11 items-center gap-2.5 rounded-md bg-tractor px-6.5 py-4 text-[19px] font-bold text-ground no-underline"
 						>
 							<PhoneIcon size={20} />
@@ -157,6 +159,7 @@ function RecentWork({ photos }: { photos: GalleryPhoto[] }) {
 }
 
 function WhyUs() {
+	const { serviceArea } = useSiteSettings();
 	return (
 		<section
 			id="area"
@@ -182,7 +185,7 @@ function WhyUs() {
 						</h3>
 						<p className="m-0 text-ink">Based in the {site.region} region.</p>
 						<ul className="m-0 mt-1 flex list-none flex-wrap gap-2 p-0">
-							{site.serviceArea.map((town, i) => (
+							{serviceArea.map((town, i) => (
 								<li
 									key={town}
 									className={

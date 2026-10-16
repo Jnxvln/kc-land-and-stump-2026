@@ -1,10 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { navItems } from "#/lib/nav";
-import { site } from "#/lib/site";
+import { useSiteSettings } from "#/lib/use-site-settings";
 import { MobileMenu } from "./MobileMenu";
 import { PhoneIcon } from "./PhoneIcon";
 
 export function SiteHeader() {
+	const { phone, phoneHref } = useSiteSettings();
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 
 	return (
@@ -41,11 +42,11 @@ export function SiteHeader() {
 
 				<div className="flex items-center gap-3">
 					<a
-						href={site.phoneHref}
+						href={phoneHref}
 						className="hidden min-h-11 shrink-0 items-center gap-2.5 rounded-md bg-tractor px-5 py-3 font-bold whitespace-nowrap text-ground no-underline md:inline-flex"
 					>
 						<PhoneIcon />
-						{site.phone}
+						{phone}
 					</a>
 
 					<MobileMenu />

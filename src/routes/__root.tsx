@@ -11,10 +11,15 @@ import { MobileCallBar } from "#/components/MobileCallBar";
 import { ScrollToTop } from "#/components/ScrollToTop";
 import { SiteFooter } from "#/components/SiteFooter";
 import { SiteHeader } from "#/components/SiteHeader";
+import { getSiteSettings } from "#/functions/settings";
 import { site } from "#/lib/site";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
+	loader: () => getSiteSettings(),
+	// Settings rarely change, so don't refetch on every client-side navigation.
+	// Saving in the admin calls router.invalidate(), which refreshes immediately.
+	staleTime: 5 * 60 * 1000,
 	head: () => ({
 		meta: [
 			{ charSet: "utf-8" },
