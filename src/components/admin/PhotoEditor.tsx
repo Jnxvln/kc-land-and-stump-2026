@@ -7,7 +7,7 @@ import {
 	updatePhoto,
 } from "#/functions/photos";
 import { photoUrl } from "#/lib/photos";
-import { PLACEMENTS } from "#/lib/placements";
+import { PLACEMENT_GROUPS } from "#/lib/placements";
 import { services } from "#/lib/services";
 
 const field =
@@ -137,28 +137,35 @@ export function PhotoEditor({
 						</select>
 					</label>
 
-					<fieldset className="m-0 flex flex-col gap-1 border-0 p-0">
-						<legend className="mb-2 p-0 font-semibold">
+					<fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
+						<legend className="mb-1 p-0 font-semibold">
 							Feature this photo
 						</legend>
-						{PLACEMENTS.map((p) => (
-							<label
-								key={p.id}
-								className="flex min-h-11 cursor-pointer items-center gap-3"
-							>
-								<input
-									type="checkbox"
-									name="spots"
-									value={p.id}
-									defaultChecked={photo.spots.includes(p.id)}
-									className="size-5 accent-tractor"
-								/>
-								{p.label}
-							</label>
-						))}
-						<p className="m-0 mt-1 text-[15px] text-muted">
+						<p className="m-0 text-[15px] text-muted">
 							Each spot shows one photo. Checking a spot moves it to this photo.
 						</p>
+						{PLACEMENT_GROUPS.map(({ group, placements }) => (
+							<div key={group} className="flex flex-col">
+								<span className="text-[15px] font-bold text-muted">
+									{group}
+								</span>
+								{placements.map((p) => (
+									<label
+										key={p.id}
+										className="flex min-h-11 cursor-pointer items-center gap-3"
+									>
+										<input
+											type="checkbox"
+											name="spots"
+											value={p.id}
+											defaultChecked={photo.spots.includes(p.id)}
+											className="size-5 accent-tractor"
+										/>
+										{p.label}
+									</label>
+								))}
+							</div>
+						))}
 					</fieldset>
 
 					{error && (
