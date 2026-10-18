@@ -7,7 +7,7 @@ import { site } from "#/lib/site";
 
 const publicFields = { id: true, alt: true, serviceSlug: true } as const;
 
-function toGalleryPhoto(photo: {
+export function toGalleryPhoto(photo: {
 	id: string;
 	alt: string;
 	serviceSlug: string | null;
