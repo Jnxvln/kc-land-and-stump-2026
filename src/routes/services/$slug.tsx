@@ -2,11 +2,13 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { CallTodayBand } from "#/components/CallTodayBand";
 import { PhotoGallery } from "#/components/PhotoGallery";
 import { getFeaturedPhotos, getGalleryPhotos } from "#/functions/public-photos";
+import { TEXT_ORIGINALS, toParagraphs } from "#/lib/editable-pages";
 import { sectionSpotId } from "#/lib/placements";
 import { seo } from "#/lib/seo";
 import { getService, services } from "#/lib/services";
 import { site } from "#/lib/site";
 import { container, sectionX } from "#/lib/ui";
+import { usePageText } from "#/lib/use-page-text";
 
 export const Route = createFileRoute("/services/$slug")({
 	loader: async ({ params }) => {
@@ -18,20 +20,25 @@ export const Route = createFileRoute("/services/$slug")({
 		]);
 		return { service, photos, featured };
 	},
-	head: ({ loaderData }) =>
-		loaderData
-			? seo({
-					title: `${loaderData.service.title} | ${site.name}`,
-					description: loaderData.service.blurb,
-					path: `/services/${loaderData.service.slug}`,
-				})
-			: {},
+	head: ({ loaderData, matches }) => {
+		if (!loaderData) return {};
+		const published =
+			(matches[0]?.loaderData as { text?: Record<string, string> } | undefined)
+				?.text ?? {};
+		const blurbKey = `service-${loaderData.service.slug}-blurb`;
+		return seo({
+			title: `${loaderData.service.title} | ${site.name}`,
+			description: published[blurbKey] ?? TEXT_ORIGINALS[blurbKey],
+			path: `/services/${loaderData.service.slug}`,
+		});
+	},
 	component: ServicePage,
 });
 
 function ServicePage() {
 	const { service, photos, featured } = Route.useLoaderData();
 	const otherServices = services.filter((s) => s.slug !== service.slug);
+	const text = usePageText();
 
 	return (
 		<>
@@ -46,7 +53,9 @@ function ServicePage() {
 					<h1 className="m-0 font-display text-[40px] leading-[1.05] font-extrabold font-stretch-expanded text-cream md:text-[56px]">
 						{service.title}
 					</h1>
-					<p className="m-0 max-w-[36em] text-xl">{service.blurb}</p>
+					<p className="m-0 max-w-[36em] text-xl">
+						{text(`service-${service.slug}-blurb`)}
+					</p>
 				</div>
 			</section>
 
@@ -70,11 +79,13 @@ function ServicePage() {
 								<div
 									className={`flex flex-col gap-4 ${i % 2 === 1 ? "md:order-2" : ""}`}
 								>
-									{section.body.map((paragraph) => (
-										<p key={paragraph} className="m-0 text-lg md:text-xl">
-											{paragraph}
-										</p>
-									))}
+									{toParagraphs(text(sectionSpotId(service.slug, i))).map(
+										(paragraph) => (
+											<p key={paragraph} className="m-0 text-lg md:text-xl">
+												{paragraph}
+											</p>
+										),
+									)}
 								</div>
 								{image && (
 									<img
