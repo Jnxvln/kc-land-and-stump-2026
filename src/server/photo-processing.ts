@@ -24,7 +24,7 @@ function isHeic(input: Buffer): boolean {
 }
 
 /** Opens an upload with sharp, decoding HEIC first since sharp's prebuilt binaries can't. */
-async function openImage(input: Buffer): Promise<sharp.Sharp> {
+async function openImage(input: Buffer): Promise<ReturnType<typeof sharp>> {
 	if (!isHeic(input)) {
 		return sharp(input, {
 			failOn: "error",
