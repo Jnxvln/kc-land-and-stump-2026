@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { GalleryPhoto } from "#/lib/gallery";
 import { type Service, services } from "#/lib/services";
+import { usePageText } from "#/lib/use-page-text";
 
 type HeadingTag = "h2" | "h3";
 
@@ -13,6 +14,8 @@ export function ServiceCard({
 	photo?: GalleryPhoto;
 	headingAs?: HeadingTag;
 }) {
+	const text = usePageText();
+
 	return (
 		<Link
 			to="/services/$slug"
@@ -29,7 +32,9 @@ export function ServiceCard({
 				<Heading className="m-0 font-display text-[19px] font-extrabold font-stretch-expanded text-cream">
 					{service.title}
 				</Heading>
-				<p className="m-0 text-base leading-snug">{service.blurb}</p>
+				<p className="m-0 text-base leading-snug">
+					{text(`service-${service.slug}-blurb`)}
+				</p>
 				<span className="mt-auto pt-1 text-[15px] font-bold text-tractor group-hover:underline">
 					Learn more →
 				</span>
