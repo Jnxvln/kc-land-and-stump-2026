@@ -5,6 +5,7 @@ import { listPhotos } from "#/functions/photos";
 import { getEditablePage } from "#/lib/editable-pages";
 
 export const Route = createFileRoute("/admin/pages/$page")({
+	gcTime: 0,
 	loader: async ({ params }) => {
 		const page = getEditablePage(params.page);
 		if (!page) throw notFound();
