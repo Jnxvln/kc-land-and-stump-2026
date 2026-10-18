@@ -1,24 +1,35 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { CallTodayBand } from "#/components/CallTodayBand";
 import { PhotoGallery } from "#/components/PhotoGallery";
+import { PreviewBanner } from "#/components/PreviewBanner";
+import { getPagePreview } from "#/functions/pages";
 import { getFeaturedPhotos, getGalleryPhotos } from "#/functions/public-photos";
 import { TEXT_ORIGINALS, toParagraphs } from "#/lib/editable-pages";
 import { sectionSpotId } from "#/lib/placements";
+import { applyPreviewPhotos, previewSearch } from "#/lib/preview";
 import { seo } from "#/lib/seo";
 import { getService, services } from "#/lib/services";
 import { site } from "#/lib/site";
 import { container, sectionX } from "#/lib/ui";
-import { usePageText } from "#/lib/use-page-text";
+import { PreviewTextProvider, usePageText } from "#/lib/use-page-text";
 
 export const Route = createFileRoute("/services/$slug")({
-	loader: async ({ params }) => {
+	validateSearch: previewSearch,
+	loaderDeps: ({ search }) => ({ preview: search.preview }),
+	loader: async ({ params, deps }) => {
 		const service = getService(params.slug);
 		if (!service) throw notFound();
-		const [photos, featured] = await Promise.all([
+		const [photos, featured, preview] = await Promise.all([
 			getGalleryPhotos({ data: { serviceSlug: service.slug, limit: 8 } }),
 			getFeaturedPhotos(),
+			deps.preview ? getPagePreview({ data: { page: service.slug } }) : null,
 		]);
-		return { service, photos, featured };
+		return {
+			service,
+			photos,
+			featured: applyPreviewPhotos(featured, preview),
+			preview,
+		};
 	},
 	head: ({ loaderData, matches }) => {
 		if (!loaderData) return {};
@@ -26,22 +37,41 @@ export const Route = createFileRoute("/services/$slug")({
 			(matches[0]?.loaderData as { text?: Record<string, string> } | undefined)
 				?.text ?? {};
 		const blurbKey = `service-${loaderData.service.slug}-blurb`;
-		return seo({
+		const tags = seo({
 			title: `${loaderData.service.title} | ${site.name}`,
 			description: published[blurbKey] ?? TEXT_ORIGINALS[blurbKey],
 			path: `/services/${loaderData.service.slug}`,
 		});
+		if (loaderData.preview)
+			tags.meta.push({ name: "robots", content: "noindex" });
+		return tags;
 	},
 	component: ServicePage,
 });
 
 function ServicePage() {
-	const { service, photos, featured } = Route.useLoaderData();
+	const { preview } = Route.useLoaderData();
+	return (
+		<PreviewTextProvider value={preview?.text ?? null}>
+			<ServicePageContent />
+		</PreviewTextProvider>
+	);
+}
+
+function ServicePageContent() {
+	const { service, photos, featured, preview } = Route.useLoaderData();
 	const otherServices = services.filter((s) => s.slug !== service.slug);
 	const text = usePageText();
 
 	return (
 		<>
+			{preview && (
+				<PreviewBanner
+					pageId={service.slug}
+					path={`/services/${service.slug}`}
+					hasDraft={preview.hasDraft}
+				/>
+			)}
 			<section className={`${sectionX} pt-12 pb-10 md:pt-16`}>
 				<div className={`${container} flex flex-col gap-4`}>
 					<Link

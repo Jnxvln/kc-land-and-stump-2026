@@ -145,7 +145,13 @@ export function PageEditor({
 		}
 	}
 
+	async function preview() {
+		await flush();
+		await router.navigate({ href: `${page.path}?preview=${Date.now()}` });
+	}
+
 	const photosById = new Map(photos.map((p) => [p.id, p]));
+
 	function resolvePhoto(block: PageBlock): ResolvedPhoto {
 		if (!block.photo) return { kind: "none" };
 		const id = content.photos[block.photo.spot];
@@ -180,14 +186,13 @@ export function PageEditor({
 					<h1 className="m-0 font-display text-3xl font-extrabold font-stretch-expanded text-cream md:text-4xl">
 						{page.title}
 					</h1>
-					<a
-						href={page.path}
-						target="_blank"
-						rel="noopener"
-						className="font-bold text-tractor no-underline"
+					<button
+						type="button"
+						onClick={preview}
+						className="cursor-pointer border-0 bg-transparent p-0 font-bold text-tractor"
 					>
-						View live page ↗
-					</a>
+						Preview page →
+					</button>
 				</div>
 				<p className="m-0 text-muted">
 					Type right in the boxes. Leave a blank line to start a new paragraph.
@@ -215,7 +220,15 @@ export function PageEditor({
 					<output className="block font-semibold text-cream">
 						<StatusText status={status} />
 					</output>
-					<div className="flex gap-3">
+					<div className="flex flex-wrap gap-3">
+						<button
+							type="button"
+							onClick={preview}
+							disabled={busy !== null}
+							className={secondaryButton}
+						>
+							Preview
+						</button>
 						<button
 							type="button"
 							onClick={discard}

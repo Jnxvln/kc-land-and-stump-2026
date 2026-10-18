@@ -1,33 +1,44 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CallTodayBand } from "#/components/CallTodayBand";
 import { PhoneIcon } from "#/components/PhoneIcon";
+import { PreviewBanner } from "#/components/PreviewBanner";
 import { ServiceGrid } from "#/components/ServiceCard";
+import { getPagePreview } from "#/functions/pages";
 import { getFeaturedPhotos, getGalleryPhotos } from "#/functions/public-photos";
 import { toParagraphs } from "#/lib/editable-pages";
 import { type GalleryPhoto, staticGalleryPhotos } from "#/lib/gallery";
+import { applyPreviewPhotos, previewSearch } from "#/lib/preview";
 import { seo } from "#/lib/seo";
 import { site } from "#/lib/site";
 import { container, h2, sectionX } from "#/lib/ui";
-import { usePageText } from "#/lib/use-page-text";
+import { PreviewTextProvider, usePageText } from "#/lib/use-page-text";
 import { useSiteSettings } from "#/lib/use-site-settings";
 
 export const Route = createFileRoute("/")({
-	loader: async () => {
-		const [featured, recent] = await Promise.all([
+	validateSearch: previewSearch,
+	loaderDeps: ({ search }) => ({ preview: search.preview }),
+	loader: async ({ deps }) => {
+		const [featured, recent, preview] = await Promise.all([
 			getFeaturedPhotos(),
 			getGalleryPhotos({ data: { limit: 6 } }),
+			deps.preview ? getPagePreview({ data: { page: "home" } }) : null,
 		]);
 		return {
-			featured,
+			featured: applyPreviewPhotos(featured, preview),
 			recent: recent.length > 0 ? recent : staticGalleryPhotos.slice(0, 6),
+			preview,
 		};
 	},
-	head: () =>
-		seo({
+	head: ({ loaderData }) => {
+		const tags = seo({
 			title: `${site.name} | Stump Grinding & Land Clearing in ${site.region}`,
 			description: `Stump grinding, land clearing, bush hogging, gravel spreading, and hauling around ${site.region}. Free estimates.`,
 			path: "/",
-		}),
+		});
+		if (loaderData?.preview)
+			tags.meta.push({ name: "robots", content: "noindex" });
+		return tags;
+	},
 	component: HomePage,
 });
 
@@ -43,15 +54,18 @@ const reasons = [
 ] as const;
 
 function HomePage() {
-	const { featured, recent } = Route.useLoaderData();
+	const { featured, recent, preview } = Route.useLoaderData();
 	return (
-		<>
+		<PreviewTextProvider value={preview?.text ?? null}>
+			{preview && (
+				<PreviewBanner pageId="home" path="/" hasDraft={preview.hasDraft} />
+			)}
 			<Hero photo={featured["home-hero"]} />
 			<Services featured={featured} />
 			<RecentWork photos={recent} />
 			<WhyUs />
 			<CallTodayBand />
-		</>
+		</PreviewTextProvider>
 	);
 }
 

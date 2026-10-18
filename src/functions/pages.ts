@@ -1,12 +1,56 @@
 import { createServerFn } from "@tanstack/react-start";
 import { prisma } from "#/db";
+import { toGalleryPhoto } from "#/functions/public-photos";
 import {
 	type EditablePage,
 	getEditablePage,
 	MAX_TEXT_LENGTH,
 	TEXT_ORIGINALS,
 } from "#/lib/editable-pages";
-import { requireAdmin } from "#/server/auth";
+import type { GalleryPhoto } from "#/lib/gallery";
+import { isAdminRequest, requireAdmin } from "#/server/auth";
+
+/**
+ * A page's draft (or live content, if there's no draft), shaped for the public page.
+ * Returns null for anyone who isn't signed in, so a preview link is just the live page to them.
+ */
+export const getPagePreview = createServerFn({ method: "GET" })
+	.validator((data: { page: string }) => ({ page: requirePage(data) }))
+	.handler(async ({ data }) => {
+		if (!isAdminRequest()) return null;
+		const page = data.page;
+		const draft = await prisma.pageDraft.findUnique({
+			where: { page: page.id },
+		});
+		const content = draft
+			? cleanContent(page, draft.content)
+			: await liveContent(page);
+
+		// Same rule as the live site: hidden or deleted photos fall back to the original.
+		const ids = Object.values(content.photos).filter(
+			(id): id is string => id !== null,
+		);
+		const visible = await prisma.photo.findMany({
+			where: { id: { in: ids }, visible: true },
+			select: { id: true, alt: true, serviceSlug: true },
+		});
+		const byId = new Map(visible.map((p) => [p.id, toGalleryPhoto(p)]));
+
+		return {
+			hasDraft: draft !== null,
+			text: content.text,
+			photos: Object.fromEntries(
+				Object.entries(content.photos).map(([spot, id]) => [
+					spot,
+					id ? (byId.get(id) ?? null) : null,
+				]),
+			) as Record<string, GalleryPhoto | null>,
+		};
+	});
+
+export type PagePreview = NonNullable<
+	Awaited<ReturnType<typeof getPagePreview>>
+>;
 
 /** A page's complete state: every text field, and the photo id for every spot (null = use original). */
 export type PageContent = {
