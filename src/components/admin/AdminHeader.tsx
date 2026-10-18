@@ -29,6 +29,13 @@ export function AdminHeader() {
 						Photos
 					</Link>
 					<Link
+						to="/admin/pages"
+						className={navLink}
+						activeProps={{ className: activeLink }}
+					>
+						Pages
+					</Link>
+					<Link
 						to="/admin/business"
 						className={navLink}
 						activeProps={{ className: activeLink }}
