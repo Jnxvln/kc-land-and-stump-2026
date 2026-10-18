@@ -19,6 +19,8 @@ import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminPhotosRouteImport } from './routes/admin/photos'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as ServicesSlugRouteImport } from './routes/services/$slug'
+import { Route as AdminPagesIndexRouteImport } from './routes/admin/pages/index'
+import { Route as AdminPagesPageRouteImport } from './routes/admin/pages/$page'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +72,16 @@ const ServicesSlugRoute = ServicesSlugRouteImport.update({
   path: '/services/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPagesIndexRoute = AdminPagesIndexRouteImport.update({
+  id: '/pages/',
+  path: '/pages/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminPagesPageRoute = AdminPagesPageRouteImport.update({
+  id: '/pages/$page',
+  path: '/pages/$page',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +94,8 @@ export interface FileRoutesByFullPath {
   '/services/$slug': typeof ServicesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/services/': typeof ServicesIndexRoute
+  '/admin/pages/$page': typeof AdminPagesPageRoute
+  '/admin/pages/': typeof AdminPagesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -93,6 +107,8 @@ export interface FileRoutesByTo {
   '/services/$slug': typeof ServicesSlugRoute
   '/admin': typeof AdminIndexRoute
   '/services': typeof ServicesIndexRoute
+  '/admin/pages/$page': typeof AdminPagesPageRoute
+  '/admin/pages': typeof AdminPagesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,6 +122,8 @@ export interface FileRoutesById {
   '/services/$slug': typeof ServicesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/services/': typeof ServicesIndexRoute
+  '/admin/pages/$page': typeof AdminPagesPageRoute
+  '/admin/pages/': typeof AdminPagesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -120,6 +138,8 @@ export interface FileRouteTypes {
     | '/services/$slug'
     | '/admin/'
     | '/services/'
+    | '/admin/pages/$page'
+    | '/admin/pages/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -131,6 +151,8 @@ export interface FileRouteTypes {
     | '/services/$slug'
     | '/admin'
     | '/services'
+    | '/admin/pages/$page'
+    | '/admin/pages'
   id:
     | '__root__'
     | '/'
@@ -143,6 +165,8 @@ export interface FileRouteTypes {
     | '/services/$slug'
     | '/admin/'
     | '/services/'
+    | '/admin/pages/$page'
+    | '/admin/pages/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -226,6 +250,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/pages/': {
+      id: '/admin/pages/'
+      path: '/pages'
+      fullPath: '/admin/pages/'
+      preLoaderRoute: typeof AdminPagesIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/pages/$page': {
+      id: '/admin/pages/$page'
+      path: '/pages/$page'
+      fullPath: '/admin/pages/$page'
+      preLoaderRoute: typeof AdminPagesPageRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
   }
 }
 
@@ -234,6 +272,8 @@ interface AdminRouteRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AdminPhotosRoute: typeof AdminPhotosRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminPagesPageRoute: typeof AdminPagesPageRoute
+  AdminPagesIndexRoute: typeof AdminPagesIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
@@ -241,6 +281,8 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AdminPhotosRoute: AdminPhotosRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminPagesPageRoute: AdminPagesPageRoute,
+  AdminPagesIndexRoute: AdminPagesIndexRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
