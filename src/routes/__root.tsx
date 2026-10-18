@@ -4,6 +4,7 @@ import {
 	HeadContent,
 	Link,
 	Scripts,
+	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { AdminShortcut } from "#/components/AdminShortcut";
@@ -54,17 +55,24 @@ export const Route = createRootRoute({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const isAdmin = pathname.startsWith("/admin");
+
 	return (
 		<html lang="en">
 			<head>
 				<HeadContent />
 			</head>
 			<body className="flex min-h-dvh flex-col">
-				<SiteHeader />
+				{!isAdmin && <SiteHeader />}
 				<main className="flex-1">{children}</main>
-				<SiteFooter />
-				<MobileCallBar />
-				<AdminShortcut />
+				{!isAdmin && (
+					<>
+						<SiteFooter />
+						<MobileCallBar />
+						<AdminShortcut />
+					</>
+				)}
 				<ScrollToTop />
 				<TanStackDevtools
 					config={{ position: "bottom-right" }}
