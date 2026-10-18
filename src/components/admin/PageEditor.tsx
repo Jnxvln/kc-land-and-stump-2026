@@ -1,5 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import {
 	discardPageDraft,
 	getPageEditor,
@@ -313,6 +313,17 @@ function BlockRow({
 }) {
 	const textId = useId();
 	const helpId = useId();
+	const textRef = useRef<HTMLTextAreaElement>(null);
+
+	// Grow the box to fit its content, on load and after every change.
+	useLayoutEffect(() => {
+		const el = textRef.current;
+		if (!el || text === undefined) return;
+		const borders = el.offsetHeight - el.clientHeight;
+		el.style.height = "auto";
+		el.style.height = `${el.scrollHeight + borders}px`;
+	}, [text]);
+
 	const changed =
 		block.text !== undefined &&
 		text !== undefined &&
@@ -334,12 +345,13 @@ function BlockRow({
 						</span>
 					)}
 					<textarea
+						ref={textRef}
 						id={textId}
 						aria-describedby={block.help ? helpId : undefined}
 						value={text ?? ""}
 						rows={block.text.rows}
 						onChange={(e) => onText(e.target.value)}
-						className="resize-y rounded-md border border-line-strong bg-ground px-3.5 py-3 text-base leading-relaxed text-cream"
+						className="resize-none overflow-hidden rounded-md border border-line-strong bg-ground px-3.5 py-3 text-base leading-relaxed text-cream"
 					/>
 					{changed && block.text && (
 						<button
