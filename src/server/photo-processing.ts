@@ -1,4 +1,43 @@
+import decodeHeic from "heic-decode";
 import sharp from "sharp";
+
+const MAX_INPUT_PIXELS = 60_000_000;
+
+// HEIF files start with an "ftyp" box naming their format ("brand") in bytes 8–12.
+const HEIC_BRANDS = new Set([
+	"heic",
+	"heix",
+	"hevc",
+	"hevx",
+	"heim",
+	"heis",
+	"mif1",
+	"msf1",
+]);
+
+function isHeic(input: Buffer): boolean {
+	return (
+		input.length > 12 &&
+		input.toString("ascii", 4, 8) === "ftyp" &&
+		HEIC_BRANDS.has(input.toString("ascii", 8, 12))
+	);
+}
+
+/** Opens an upload with sharp, decoding HEIC first since sharp's prebuilt binaries can't. */
+async function openImage(input: Buffer): Promise<sharp.Sharp> {
+	if (!isHeic(input)) {
+		return sharp(input, {
+			failOn: "error",
+			limitInputPixels: MAX_INPUT_PIXELS,
+		});
+	}
+	const { width, height, data } = await decodeHeic({ buffer: input });
+	if (width * height > MAX_INPUT_PIXELS) throw new Error("Image is too large.");
+	// Hand sharp the decoded pixels directly: 4 channels (red, green, blue, alpha) per pixel.
+	return sharp(Buffer.from(data.buffer, data.byteOffset, data.byteLength), {
+		raw: { width, height, channels: 4 },
+	});
+}
 
 export class InvalidImageError extends Error {}
 
@@ -14,10 +53,7 @@ export async function processPhoto(
 	rotateBy?: 90 | 270,
 ): Promise<ProcessedPhoto> {
 	try {
-		const image = sharp(input, {
-			failOn: "error",
-			limitInputPixels: 60_000_000,
-		});
+		const image = await openImage(input);
 		// No angle: apply the phone's orientation flag. With an angle: rotate by that.
 		const base = rotateBy ? image.rotate(rotateBy) : image.rotate();
 
@@ -52,7 +88,7 @@ export async function processPhoto(
 		};
 	} catch {
 		throw new InvalidImageError(
-			"That file couldn't be read as a photo. Try a JPEG, PNG, or WebP image.",
+			"That file couldn't be read as a photo. Try a JPEG, PNG, WebP, or HEIC image.",
 		);
 	}
 }

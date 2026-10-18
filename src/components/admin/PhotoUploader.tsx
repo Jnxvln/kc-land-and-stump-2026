@@ -99,7 +99,7 @@ export function PhotoUploader() {
 				<input
 					type="file"
 					name="files"
-					accept="image/*"
+					accept="image/*,.heic,.heif"
 					multiple
 					className="sr-only"
 					onChange={(e) => setSelected(Array.from(e.currentTarget.files ?? []))}
