@@ -7,7 +7,7 @@ import {
 	updatePhoto,
 } from "#/functions/photos";
 import { photoUrl } from "#/lib/photos";
-import { PLACEMENT_GROUPS } from "#/lib/placements";
+import { placementName } from "#/lib/placements";
 import { services } from "#/lib/services";
 
 const field =
@@ -37,13 +37,17 @@ export function PhotoEditor({
 		if (!photo && dialog.open) dialog.close();
 	}, [photo]);
 
-	async function run(label: string, action: () => Promise<unknown>) {
+	async function run(
+		label: string,
+		action: () => Promise<unknown>,
+		{ close = true } = {},
+	) {
 		setBusy(label);
 		setError(null);
 		try {
 			await action();
 			await router.invalidate();
-			onClose();
+			if (close) onClose();
 		} catch (err) {
 			setError((err as Error).message);
 		} finally {
@@ -60,7 +64,6 @@ export function PhotoEditor({
 			alt: String(form.get("alt") ?? ""),
 			visible: form.get("visible") === "on",
 			serviceSlug: String(form.get("serviceSlug") ?? "") || null,
-			spots: form.getAll("spots").map(String),
 		};
 		void run("save", () => updatePhoto({ data }));
 	}
@@ -77,7 +80,7 @@ export function PhotoEditor({
 			onClick={(e) => {
 				if (e.target === e.currentTarget && !busy) onClose();
 			}}
-			className="m-auto max-h-[92dvh] w-[min(92vw,640px)] overflow-y-auto rounded-[10px] border border-line bg-ground p-0 text-gold backdrop:bg-black/80"
+			className="m-auto max-h-[92dvh] w-[min(94vw,1000px)] overflow-y-auto rounded-[10px] border border-line bg-ground p-0 text-gold backdrop:bg-black/80"
 		>
 			{photo && (
 				<form
@@ -85,144 +88,174 @@ export function PhotoEditor({
 					onSubmit={handleSave}
 					className="flex flex-col gap-4 p-4 md:p-5"
 				>
-					<div className="flex items-center justify-between gap-3">
-						<h2 className="m-0 font-display text-xl font-extrabold font-stretch-expanded text-cream">
-							Edit photo
-						</h2>
-						<button type="button" onClick={onClose} className={secondaryButton}>
-							Close
-						</button>
-					</div>
-
-					<img
-						src={photoUrl(photo.id, "large")}
-						alt={photo.alt}
-						className="block max-h-[40dvh] w-full rounded-lg bg-card object-contain"
-					/>
-
-					<label className="flex min-h-12 cursor-pointer items-center gap-3 text-lg font-semibold">
-						<input
-							type="checkbox"
-							name="visible"
-							defaultChecked={photo.visible}
-							className="size-6 accent-tractor"
-						/>
-						Show on the website
-					</label>
-
-					<label className="flex flex-col gap-2 font-semibold">
-						Description (helps Google and screen readers)
-						<input
-							name="alt"
-							defaultValue={photo.alt}
-							maxLength={200}
-							placeholder="e.g. Stump ground down in a front yard"
-							className={field}
-						/>
-					</label>
-
-					<label className="flex flex-col gap-2 font-semibold">
-						Kind of job
-						<select
-							name="serviceSlug"
-							defaultValue={photo.serviceSlug ?? ""}
-							className={field}
-						>
-							<option value="">Not sure / mixed</option>
-							{services.map((s) => (
-								<option key={s.slug} value={s.slug}>
-									{s.title}
-								</option>
-							))}
-						</select>
-					</label>
-
-					<fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
-						<legend className="mb-1 p-0 font-semibold">
-							Feature this photo
-						</legend>
-						<p className="m-0 text-[15px] text-muted">
-							Each spot shows one photo. Checking a spot moves it to this photo.
-						</p>
-						{PLACEMENT_GROUPS.map(({ group, placements }) => (
-							<div key={group} className="flex flex-col">
-								<span className="text-[15px] font-bold text-muted">
-									{group}
-								</span>
-								{placements.map((p) => (
-									<label
-										key={p.id}
-										className="flex min-h-11 cursor-pointer items-center gap-3"
-									>
-										<input
-											type="checkbox"
-											name="spots"
-											value={p.id}
-											defaultChecked={photo.spots.includes(p.id)}
-											className="size-5 accent-tractor"
-										/>
-										{p.label}
-									</label>
-								))}
+					<div className="grid items-start gap-6 md:grid-cols-2 md:gap-7">
+						<div className="flex flex-col gap-3">
+							<img
+								src={photoUrl(photo.id, "large")}
+								alt={photo.alt}
+								className="block aspect-[4/3] w-full rounded-lg bg-card object-contain"
+							/>
+							<div className="grid grid-cols-2 gap-3">
+								<button
+									type="button"
+									disabled={busy !== null}
+									onClick={() =>
+										run("rotate", () =>
+											rotatePhoto({
+												data: { id: photo.id, direction: "left" },
+											}),
+										)
+									}
+									className={secondaryButton}
+								>
+									{busy === "rotate" ? "Rotating…" : "⟲ Rotate left"}
+								</button>
+								<button
+									type="button"
+									disabled={busy !== null}
+									onClick={() =>
+										run("rotate", () =>
+											rotatePhoto({
+												data: { id: photo.id, direction: "right" },
+											}),
+										)
+									}
+									className={secondaryButton}
+								>
+									{busy === "rotate" ? "Rotating…" : "Rotate right ⟳"}
+								</button>
 							</div>
-						))}
-					</fieldset>
+						</div>
 
-					{error && (
-						<p role="alert" className="m-0 font-semibold text-tractor">
-							{error}
-						</p>
-					)}
+						<div className="flex flex-col gap-5">
+							<label className="flex min-h-12 cursor-pointer items-center gap-3 text-lg font-semibold">
+								<input
+									type="checkbox"
+									name="visible"
+									defaultChecked={photo.visible}
+									className="size-6 accent-tractor"
+								/>
+								Show on the website
+							</label>
 
-					<button
-						type="submit"
-						disabled={busy !== null}
-						className="min-h-12 cursor-pointer rounded-md bg-tractor text-lg font-bold text-ground disabled:opacity-50"
-					>
-						{busy === "save" ? "Saving…" : "Save changes"}
-					</button>
+							<label className="flex flex-col gap-2 font-semibold">
+								Description
+								<input
+									name="alt"
+									defaultValue={photo.alt}
+									maxLength={200}
+									placeholder="e.g. Stump ground down in a front yard"
+									className={field}
+								/>
+							</label>
 
-					<div className="grid grid-cols-2 gap-3">
-						<button
-							type="button"
-							disabled={busy !== null}
-							onClick={() =>
-								run("rotate", () =>
-									rotatePhoto({ data: { id: photo.id, direction: "left" } }),
-								)
-							}
-							className={secondaryButton}
-						>
-							{busy === "rotate" ? "Rotating…" : "⟲ Rotate left"}
-						</button>
-						<button
-							type="button"
-							disabled={busy !== null}
-							onClick={() =>
-								run("rotate", () =>
-									rotatePhoto({ data: { id: photo.id, direction: "right" } }),
-								)
-							}
-							className={secondaryButton}
-						>
-							{busy === "rotate" ? "Rotating…" : "Rotate right ⟳"}
-						</button>
+							<label className="flex flex-col gap-2 font-semibold">
+								Kind of job
+								<select
+									name="serviceSlug"
+									defaultValue={photo.serviceSlug ?? ""}
+									className={field}
+								>
+									<option value="">Not sure / mixed</option>
+									{services.map((s) => (
+										<option key={s.slug} value={s.slug}>
+											{s.title}
+										</option>
+									))}
+								</select>
+							</label>
+
+							<div className="flex flex-col gap-2">
+								<span className="font-semibold">Featured on</span>
+								{photo.spots.length === 0 ? (
+									<p className="m-0 text-[15px] text-muted">
+										Not featured anywhere.
+									</p>
+								) : (
+									<ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+										{photo.spots.map((spot) => (
+											<li
+												key={spot}
+												className="inline-flex items-center gap-1 rounded-full bg-line pl-3 text-[15px] font-semibold text-cream"
+											>
+												{placementName(spot)}
+												<button
+													type="button"
+													disabled={busy !== null}
+													aria-label={`Remove from ${placementName(spot)}`}
+													onClick={() =>
+														run(
+															"unfeature",
+															() =>
+																updatePhoto({
+																	data: {
+																		id: photo.id,
+																		spots: photo.spots.filter(
+																			(s) => s !== spot,
+																		),
+																	},
+																}),
+															{ close: false },
+														)
+													}
+													className="flex size-10 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-gold disabled:opacity-50"
+												>
+													<svg
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="2.4"
+														strokeLinecap="round"
+														aria-hidden="true"
+													>
+														<path d="M6 6l12 12M18 6L6 18" />
+													</svg>
+												</button>
+											</li>
+										))}
+									</ul>
+								)}
+								<p className="m-0 text-[15px] text-muted">
+									To feature this photo somewhere new, open that page under
+									Pages and choose Change photo.
+								</p>
+							</div>
+
+							{error && (
+								<p role="alert" className="m-0 font-semibold text-tractor">
+									{error}
+								</p>
+							)}
+
+							<div className="flex gap-3 pt-1">
+								<button
+									type="submit"
+									disabled={busy !== null}
+									className="min-h-12 flex-1 cursor-pointer rounded-md bg-tractor text-lg font-bold text-ground disabled:opacity-50"
+								>
+									{busy === "save" ? "Saving…" : "Save changes"}
+								</button>
+								<button
+									type="button"
+									disabled={busy !== null}
+									onClick={() => {
+										if (
+											window.confirm("Delete this photo? This can't be undone.")
+										) {
+											void run("delete", () =>
+												deletePhoto({ data: { id: photo.id } }),
+											);
+										}
+									}}
+									className="min-h-12 cursor-pointer rounded-md border-[1.5px] border-tractor bg-transparent px-5 font-semibold text-tractor disabled:opacity-50"
+								>
+									{busy === "delete" ? "Deleting…" : "Delete photo"}
+								</button>
+							</div>
+						</div>
 					</div>
-
-					<button
-						type="button"
-						disabled={busy !== null}
-						onClick={() => {
-							if (window.confirm("Delete this photo? This can't be undone.")) {
-								void run("delete", () =>
-									deletePhoto({ data: { id: photo.id } }),
-								);
-							}
-						}}
-						className="min-h-12 cursor-pointer rounded-md border-[1.5px] border-tractor bg-transparent font-semibold text-tractor disabled:opacity-50"
-					>
-						{busy === "delete" ? "Deleting…" : "Delete photo"}
-					</button>
 				</form>
 			)}
 		</dialog>
