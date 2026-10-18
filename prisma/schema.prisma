@@ -38,3 +38,17 @@ model SiteSettings {
   serviceArea String[]
   updatedAt   DateTime @updatedAt
 }
+
+/// Published wording that replaces an original from the code. No row = original.
+model PageText {
+  key       String   @id
+  text      String
+  updatedAt DateTime @updatedAt
+}
+
+/// Unpublished edits to one page, saved automatically while editing.
+model PageDraft {
+  page      String   @id
+  content   Json
+  updatedAt DateTime @updatedAt
+}

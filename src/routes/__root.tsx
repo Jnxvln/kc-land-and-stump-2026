@@ -12,13 +12,20 @@ import { MobileCallBar } from "#/components/MobileCallBar";
 import { ScrollToTop } from "#/components/ScrollToTop";
 import { SiteFooter } from "#/components/SiteFooter";
 import { SiteHeader } from "#/components/SiteHeader";
+import { getPublishedText } from "#/functions/page-text";
 import { getSiteSettings } from "#/functions/settings";
 import { localBusinessJsonLd } from "#/lib/seo";
 import { site } from "#/lib/site";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
-	loader: () => getSiteSettings(),
+	loader: async () => {
+		const [settings, text] = await Promise.all([
+			getSiteSettings(),
+			getPublishedText(),
+		]);
+		return { ...settings, text };
+	},
 	// Settings rarely change, so don't refetch on every client-side navigation.
 	// Saving in the admin calls router.invalidate(), which refreshes immediately.
 	staleTime: 5 * 60 * 1000,

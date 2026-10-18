@@ -3,10 +3,12 @@ import { CallTodayBand } from "#/components/CallTodayBand";
 import { PhoneIcon } from "#/components/PhoneIcon";
 import { ServiceGrid } from "#/components/ServiceCard";
 import { getFeaturedPhotos, getGalleryPhotos } from "#/functions/public-photos";
+import { toParagraphs } from "#/lib/editable-pages";
 import { type GalleryPhoto, staticGalleryPhotos } from "#/lib/gallery";
 import { seo } from "#/lib/seo";
 import { site } from "#/lib/site";
 import { container, h2, sectionX } from "#/lib/ui";
+import { usePageText } from "#/lib/use-page-text";
 import { useSiteSettings } from "#/lib/use-site-settings";
 
 export const Route = createFileRoute("/")({
@@ -55,6 +57,8 @@ function HomePage() {
 
 function Hero({ photo }: { photo?: GalleryPhoto }) {
 	const { phoneHref } = useSiteSettings();
+	const text = usePageText();
+
 	return (
 		<section id="top" className={`${sectionX} pt-14 pb-16 md:pt-22 md:pb-24`}>
 			<div
@@ -67,11 +71,11 @@ function Hero({ photo }: { photo?: GalleryPhoto }) {
 					<h1 className="m-0 font-display text-[40px] leading-[1.04] font-extrabold font-stretch-expanded text-cream md:text-[60px]">
 						Stumps ground. Land cleared. Gravel spread.
 					</h1>
-					<p className="m-0 max-w-[34em] text-xl">
-						Stump grinding, dirt work, land clearing, bush hogging, gravel
-						spreading, and dump-trailer hauling for homes and properties around{" "}
-						{site.region}. Free estimates on every job.
-					</p>
+					{toParagraphs(text("home-intro")).map((paragraph) => (
+						<p key={paragraph} className="m-0 max-w-[34em] text-xl">
+							{paragraph}
+						</p>
+					))}
 					<div className="mt-2 flex flex-wrap gap-3.5">
 						<a
 							href={phoneHref}
