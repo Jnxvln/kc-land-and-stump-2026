@@ -5,6 +5,7 @@ export type Placement = {
 	label: string;
 	short: string;
 	group: string;
+	name: string;
 };
 
 /** The spot for one content section's photo on a service page, e.g. "service-hauling-section-2". */
@@ -13,22 +14,34 @@ export function sectionSpotId(slug: string, index: number): string {
 }
 
 export const PLACEMENTS: Placement[] = [
-	{ id: "home-hero", label: "Main photo", short: "Home", group: "Home page" },
+	{
+		id: "home-hero",
+		label: "Main photo",
+		short: "Home",
+		group: "Home page",
+		name: "Home page",
+	},
 	...services.map((s) => ({
 		id: `service-${s.slug}`,
 		label: `${s.title} card`,
 		short: `${s.title} card`,
 		group: "Service cards",
+		name: `${s.title} card`,
 	})),
 	...services.flatMap((s) =>
 		s.sections.map((_, i) => ({
 			id: sectionSpotId(s.slug, i),
-			label: `Photo ${i + 1}`,
+			label: `Section ${i + 1}`,
 			short: `${s.title} ${i + 1}`,
 			group: `${s.title} page`,
+			name: `${s.title} · Section ${i + 1}`,
 		})),
 	),
 ];
+
+export function placementName(id: string): string {
+	return PLACEMENTS.find((p) => p.id === id)?.name ?? id;
+}
 
 export function isPlacement(id: string): boolean {
 	return PLACEMENTS.some((p) => p.id === id);
