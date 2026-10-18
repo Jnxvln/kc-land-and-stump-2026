@@ -1,7 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { CallTodayBand } from "#/components/CallTodayBand";
 import { PhotoGallery } from "#/components/PhotoGallery";
-import { getGalleryPhotos } from "#/functions/public-photos";
+import { getFeaturedPhotos, getGalleryPhotos } from "#/functions/public-photos";
+import { sectionSpotId } from "#/lib/placements";
 import { seo } from "#/lib/seo";
 import { getService, services } from "#/lib/services";
 import { site } from "#/lib/site";
@@ -11,10 +12,11 @@ export const Route = createFileRoute("/services/$slug")({
 	loader: async ({ params }) => {
 		const service = getService(params.slug);
 		if (!service) throw notFound();
-		const photos = await getGalleryPhotos({
-			data: { serviceSlug: service.slug, limit: 8 },
-		});
-		return { service, photos };
+		const [photos, featured] = await Promise.all([
+			getGalleryPhotos({ data: { serviceSlug: service.slug, limit: 8 } }),
+			getFeaturedPhotos(),
+		]);
+		return { service, photos, featured };
 	},
 	head: ({ loaderData }) =>
 		loaderData
@@ -28,7 +30,7 @@ export const Route = createFileRoute("/services/$slug")({
 });
 
 function ServicePage() {
-	const { service, photos } = Route.useLoaderData();
+	const { service, photos, featured } = Route.useLoaderData();
 	const otherServices = services.filter((s) => s.slug !== service.slug);
 
 	return (
@@ -50,34 +52,41 @@ function ServicePage() {
 
 			<section className={`${sectionX} pb-16 md:pb-22`}>
 				<div className={`${container} flex flex-col gap-12 md:gap-16`}>
-					{service.sections.map((section, i) => (
-						<div
-							key={section.body[0]}
-							className={
-								section.image
-									? "grid items-center gap-6 md:grid-cols-2 md:gap-12"
-									: "max-w-[44em]"
-							}
-						>
+					{service.sections.map((section, i) => {
+						const spotPhoto = featured[sectionSpotId(service.slug, i)];
+						const image = spotPhoto
+							? { src: spotPhoto.full, alt: spotPhoto.alt }
+							: section.image;
+
+						return (
 							<div
-								className={`flex flex-col gap-4 ${i % 2 === 1 ? "md:order-2" : ""}`}
+								key={section.body[0]}
+								className={
+									image
+										? "grid items-center gap-6 md:grid-cols-2 md:gap-12"
+										: "max-w-[44em]"
+								}
 							>
-								{section.body.map((paragraph) => (
-									<p key={paragraph} className="m-0 text-lg md:text-xl">
-										{paragraph}
-									</p>
-								))}
+								<div
+									className={`flex flex-col gap-4 ${i % 2 === 1 ? "md:order-2" : ""}`}
+								>
+									{section.body.map((paragraph) => (
+										<p key={paragraph} className="m-0 text-lg md:text-xl">
+											{paragraph}
+										</p>
+									))}
+								</div>
+								{image && (
+									<img
+										src={image.src}
+										alt={image.alt}
+										loading={i === 0 ? "eager" : "lazy"}
+										className="block aspect-[4/3] w-full rounded-[10px] border border-line object-cover"
+									/>
+								)}
 							</div>
-							{section.image && (
-								<img
-									src={section.image.src}
-									alt={section.image.alt}
-									loading={i === 0 ? "eager" : "lazy"}
-									className="block aspect-[4/3] w-full rounded-[10px] border border-line object-cover"
-								/>
-							)}
-						</div>
-					))}
+						);
+					})}
 				</div>
 			</section>
 
